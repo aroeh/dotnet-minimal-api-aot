@@ -1,0 +1,41 @@
+networks:
+  backend:
+
+services:
+  cache:
+    image: redis
+    container_name: redis-cache
+    networks:
+      - backend
+    restart: always
+    ports:
+      - 6379:6379
+
+  mongo:
+    image: mongo
+    container_name: mongo-data
+    restart: always
+    networks:
+      - backend
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=AzureDiamond
+      - MONGO_INITDB_ROOT_PASSWORD=hunter2
+  
+  minapiaot:
+    image: ${DOCKER_REGISTRY-}minimalapi
+    container_name: min-api-aot
+    networks:
+      - backend
+    build:
+      context: ./MinimalApiAot
+      dockerfile: Dockerfile
+    ports:
+      - 5219:80
+    depends_on:
+      - mongo
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MONGODB_CONN=mongodb://AzureDiamond:hunter2@mongo:27017
