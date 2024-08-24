@@ -1,19 +1,18 @@
-﻿using MongoDB.Driver;
+using MongoDB.Driver;
 using MinimalApiAot.Models;
 
 namespace MinimalApiAot.DataAccess
 {
-    public interface IMongoService
+    public class DatabaseWrapper(ILoggerFactory logFactory, IConfiguration config) : IDatabaseWrapper
     {
-        /// <summary>
-        /// Instance of the MongoClient object
-        /// </summary>
-        MongoClient Client { get; }
+        private readonly MongoService mongoService = new(logFactory, config);
+
 
         /// <summary>
-        /// Database instance from the client connection
+        /// Checks the connection to the database and returns basic data parameters
         /// </summary>
-        IMongoDatabase Database { get; }
+        /// <returns>Dictionary<string, object></returns>
+        public Task<Dictionary<string, object>> ConnectionEstablished() => mongoService.ConnectionEstablished();
 
         /// <summary>
         /// Finds items in the specified collection using a filter definition
@@ -22,7 +21,7 @@ namespace MinimalApiAot.DataAccess
         /// <param name="collectionName">MongoDb Collection Name</param>
         /// <param name="filter">Expression Filter to match documents</param>
         /// <returns>List T</returns>
-        Task<List<T>> FindMany<T>(string collectionName, FilterDefinition<T> filter);
+        public Task<List<T>> FindMany<T>(string collectionName, FilterDefinition<T> filter) => mongoService.FindMany<T>(collectionName, filter);
 
         /// <summary>
         /// Finds one item in the specified collection using a filter definition
@@ -31,16 +30,16 @@ namespace MinimalApiAot.DataAccess
         /// <param name="collectionName">MongoDb Collection Name</param>
         /// <param name="filter">Expression Filter to match documents</param>
         /// <returns>T</returns>
-        Task<T> FindOne<T>(string collectionName, FilterDefinition<T> filter);
+        public Task<T> FindOne<T>(string collectionName, FilterDefinition<T> filter) => mongoService.FindOne<T>(collectionName, filter);
 
         /// <summary>
         /// Insert a new document into the specified collection
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="collectionName">MongoDb Collection Name</param>
-        /// <param name="document">New Document to be inserted</param>
+        /// <param name="collectionName"></param>
+        /// <param name="document"></param>
         /// <returns>T</returns>
-        Task<T> InsertOne<T>(string collectionName, T document);
+        public Task<T> InsertOne<T>(string collectionName, T document) => mongoService.InsertOne<T>(collectionName, document);
 
         /// <summary>
         /// Replaces a document with a later version using a filter to match the record
@@ -50,6 +49,6 @@ namespace MinimalApiAot.DataAccess
         /// <param name="filter">Expression Filter to match documents</param>
         /// <param name="document">Latest version of the document</param>
         /// <returns>MongoUpdateResult</returns>
-        Task<MongoUpdateResult> ReplaceOne<T>(string collectionName, FilterDefinition<T> filter, T document);
+        public Task<MongoUpdateResult> ReplaceOne<T>(string collectionName, FilterDefinition<T> filter, T document) => mongoService.ReplaceOne<T>(collectionName, filter, document);
     }
 }

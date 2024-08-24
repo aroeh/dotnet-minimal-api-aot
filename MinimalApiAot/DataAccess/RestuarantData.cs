@@ -5,7 +5,7 @@ using MinimalApiAot.Models;
 namespace MinimalApiAot.DataAccess
 {
     // class setup using a primary constructor
-    public class RestuarantData(ILogger<RestuarantData> log, IMongoService mongo) : IRestuarantData
+    public class RestuarantData(ILogger<RestuarantData> log, IDatabaseWrapper mongo) : IRestuarantData
     {
         private readonly ILogger<RestuarantData> logger = log;
 
